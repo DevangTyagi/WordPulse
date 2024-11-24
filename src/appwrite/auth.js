@@ -1,5 +1,4 @@
 import conf from "../conf/conf.js";
-
 import { Client, Account, ID } from "appwrite";
 
 export class Authservice {
@@ -16,7 +15,7 @@ export class Authservice {
   async createAccount({ email, password, name }) {
     try {
       const userAccount = await this.account.create(
-        ID.unique,
+        ID.unique(),
         email,
         password,
         name
@@ -33,20 +32,22 @@ export class Authservice {
   }
   async login({ email, password }) {
     try {
-      return await this.account.createEmailSession(email, password);
+      console.log(email,password)
+      return await this.account.createEmailPasswordSession(email, password);
     } catch (error) {
+      console.log(error)
       throw error;
     }
   }
 
   async getCurrentuser() {
     try {
-      return await this.account.get();
+      const account = await this.account.get();
+      return account;
     } catch (error) {
-      console.log("Appwrite serive :: getCurrentUser :: error", error);
+      throw error;
     }
-    return null; //If account do not exist
-  }
+  }  
 
   async logout() {
     try {

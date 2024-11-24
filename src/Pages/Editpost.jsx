@@ -12,7 +12,7 @@ function Editpost() {
 
     useEffect( () => {
         if(slug){
-            DBServer.getposts(slug).then((post) => {
+            DBServer.getPost(slug).then((post) => {
                 if(post){
                     setposts(post)
                 }

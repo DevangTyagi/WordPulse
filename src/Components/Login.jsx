@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login as authLogin } from "../store/authslice";
 import { Btn, Input, Logo } from "./index";
@@ -11,27 +10,25 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { register, handleSubmit } = useForm();
-  const [error, seterror] = useState("");
+  const [error, setError] = useState("");
+
   const login = async (data) => {
-    seterror("");
+    setError(""); // Clear any previous errors
     try {
-      const session = await authservice.login(data);
+      // Authenticate user
+      const session = await authservice.login(data); // Pass email and password separately
       if (session) {
+        // Fetch current user details
         const userdata = await authservice.getCurrentuser();
         if (userdata) {
-          dispatch(authLogin(userdata));
-          navigate("/");
-        } else {
-          throw new Error("User data could not be retrieved");
+          dispatch(authLogin({ userdata })); // Dispatch the login action
+          navigate("/"); // Redirect to home
         }
-      } else {
-        throw new Error("Session could not be created");
       }
-    } catch (error) {
-      seterror(error.message || "Login failed");
+    } catch (err) {
+      setError(err?.message || "Login failed. Please try again.");
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -47,7 +44,7 @@ function Login() {
           Sign in to your account
         </h2>
         <p className="mt-2 text-center text-base text-black/60">
-          Don&apos;t have any account?&nbsp;
+          Don&apos;t have an account?&nbsp;
           <Link
             to="/signup"
             className="font-medium text-primary transition-all duration-200 hover:underline"
@@ -63,11 +60,11 @@ function Login() {
               placeholder="Enter your email"
               type="email"
               {...register("email", {
-                required: true,
+                required: "Email is required",
                 validate: {
-                  matchPatern: (value) =>
+                  matchPattern: (value) =>
                     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                    "Email address must be a valid address",
+                    "Invalid email format",
                 },
               })}
             />
@@ -76,7 +73,7 @@ function Login() {
               type="password"
               placeholder="Enter your password"
               {...register("password", {
-                required: true,
+                required: "Password is required",
               })}
             />
             <Btn type="submit" className="w-full">
@@ -90,12 +87,3 @@ function Login() {
 }
 
 export default Login;
-
-
-echo "# WordPulse" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/DevangTyagi/WordPulse.git
-git push -u origin main

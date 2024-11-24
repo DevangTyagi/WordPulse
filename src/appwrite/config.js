@@ -1,10 +1,11 @@
 import conf from "../conf/conf.js";
-import { Client, Databases, ID, Storage, Query } from "appwrite";
+import { Client,ID,Databases, Storage, Query } from "appwrite";
 
 export class DBService {
   client = new Client();
   databases;
   bucket;
+
 
   constructor() {
     this.client
@@ -16,6 +17,7 @@ export class DBService {
 
   async createpost({ title, slug, content, featuredImage, status, userId }) {
     try {
+      
       return await this.databases.createDocument(
         conf.appwriteDatabaseId,
         conf.appwriteCollectionId,
@@ -29,7 +31,7 @@ export class DBService {
         }
       );
     } catch (error) {
-      console.log("Appwrite serive :: createPost :: error", error);
+      console.log("Appwrite service :: createPost :: error", error);
     }
   }
 
@@ -50,6 +52,20 @@ export class DBService {
       throw error;
     }
   }
+
+  async getPost(slug){
+    try {
+        return await this.databases.getDocument(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionId,
+            slug
+        
+        )
+    } catch (error) {
+        console.log("Appwrite serive :: getPost :: error", error);
+        return false
+    }
+}
 
   async deletepost(slug) {
     try {
@@ -92,6 +108,7 @@ export class DBService {
   //file upload services
   async uploadfile(file) {
     try {
+      
       return await this.bucket.createFile(
         conf.appwriteBucketId,
         ID.unique(),
@@ -104,7 +121,7 @@ export class DBService {
 
   async deletefile(fileId) {
     try {
-      return await this.bucket.deletefile(conf.appwriteBucketId, fileId);
+      return await this.bucket.deleteFile(conf.appwriteBucketId, fileId);
       return true;
     } catch (error) {
       throw error;
