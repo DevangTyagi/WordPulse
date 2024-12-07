@@ -98,8 +98,9 @@ export class DBService {
         conf.appwriteDatabaseId,
         conf.appwriteCollectionId,
         queries
-        //[Query.equal("status" , "active")]  this also can be used
       );
+      
+
     } catch (error) {
       throw error;
     }
