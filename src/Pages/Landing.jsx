@@ -66,6 +66,7 @@ function Landing() {
             >
               <button 
                 className="bg-black text-white hover:bg-black/90 rounded-full px-8 py-6 text-lg transition-colors"
+                onClick={ () => navigate("/signup")}
               >
                 Start reading
               </button>
