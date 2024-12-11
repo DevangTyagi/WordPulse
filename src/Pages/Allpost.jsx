@@ -7,10 +7,14 @@ import { useSelector } from 'react-redux'
 function Allpost() {
     const [posts, setposts] = useState([])
     const authStatus = useSelector(state => state.auth.status)
+    const userid = useSelector(state => state.auth.userdata.$id)
+
+    console.log(userid);
+    
 
     useEffect(() => {
         if (authStatus) {
-            DBServer.getposts([]).then((posts) => {
+            DBServer.getmyposts(userid,[]).then((posts) => {
                 if (posts) {
                     setposts(posts.documents)
                 }

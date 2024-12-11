@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react'
 import DBServer from '../appwrite/config'
 import { Container, Postcard } from '../Components'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function Home() {
     const [posts, setposts] = useState([])
+    const navigate = useNavigate()
     const authStatus = useSelector(state => state.auth.status)
 
     useEffect(() => {
@@ -21,19 +23,7 @@ function Home() {
     }, [authStatus])
 
     if (!authStatus) {
-        return (
-            <div className="w-full py-8 mt-4 text-center">
-                <Container>
-                    <div className="flex flex-wrap">
-                        <div className="p-2 w-full">
-                            <h1 className="text-2xl font-bold hover:text-gray-500">
-                                Login to read posts
-                            </h1>
-                        </div>
-                    </div>
-                </Container>
-            </div>
-        )
+       navigate("/")
     }
 
     return (

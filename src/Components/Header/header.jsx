@@ -1,17 +1,39 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { Container, Logo, Logoutbtn } from "../index";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
 import { logout as authlogout } from "../../store/authslice";
+import { Search } from "lucide-react";
 
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
+  const userdata = useSelector((state) => state.auth.userdata);
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch()
+  const [authusername, setAuthUsername] = useState(""); 
+
+
+  // try {
+  //    userdata = useSelector(state => state.auth.userdata.name )
+  // } catch (error) {
+  //   console.log(error);
+    
+  // }
+
+  useEffect(() => {
+    if (userdata && userdata.name) {
+      setAuthUsername(userdata.name); // Set username when userdata is available
+    } else {
+      setAuthUsername(""); // Clear the username if userdata is empty
+    }
+  }, [userdata]); // Re-run whenever userdata changes
+
+  
 
   const logout = async() => {
     try{
@@ -24,11 +46,10 @@ function Header() {
   }
 
   const navItems = [
-    // { name: "Home", slug: "/", active: true },
+    { name: "Home", slug: "/", active: true },
     { name: "Login", slug: "/login", active: !authStatus },
     { name: "Signup", slug: "/signup", active: !authStatus },
-    // { name: "All Posts", slug: "/all-posts", active: authStatus },
-    // { name: "Add Post", slug: "/add-post", active: authStatus },
+     { name: "Add Post", slug: "/add-posts", active: authStatus },
   ];
 
   const handleSearch = () => {
@@ -37,12 +58,12 @@ function Header() {
   };
 
   return (
-<header className="px-32 py-3 relative z-50 bg-gray-50 shadow">
+<header className="  md:px-12 py-3 relative z-50 bg-white ">
   <Container>
     <div className="flex justify-between items-center">
       {/* Left: Logo */}
       <div className="mr-4">
-        <Link to="/">
+        <Link to="/home">
           <Logo width="70px" />
         </Link>
       </div>
@@ -67,24 +88,37 @@ function Header() {
             {/* Search Button */}
             <button
               onClick={handleSearch}
-              className="absolute right-0 px-3 py-2 bg-blue-100 text-white rounded-full 
-                        hover:bg-red-200 hover:scale-105 transition-all duration-300 ease-out"
+              className="absolute right-0 px-3 py-2 rounded-full 
+                       hover:scale-105 transition-all duration-300 ease-out"
             >
-              🔍
+              <Search/>
             </button>
           </div>
         )}
-
+         
+         {
+          authStatus && (
+            <div className="relative flex items-center ml-4 mr-3">
+                <button 
+      className="text-white p-3 rounded-full shadow-md  hover:scale-110 bg-gradient-to-r from-green-600 via-green-800 to-green-900 hover:shadow-lg hover:from-green-900 hover:via-green-800 hover:to-green-600 transition-all duration-300"
+      
+      onClick={() => navigate("/add-post")}
+    >
+      <PlusCircleIcon className="w-6 h-6" />
+    </button>
+            </div>
+          )
+         }
 
 
         {/* Profile Dropdown */}
-        {authStatus && (
+        {authStatus && authusername &&(
           <div className="relative ml-4">
             <button
               onClick={() => setShowDropdown((prev) => !prev)}
-              className="inline-block px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full"
+              className="inline-block px-5 py-3 sm:block bg-gray-200 hover:bg-gray-300   text-white font-bold text-xl rounded-full bg-gradient-to-r from-green-600 via-green-800 to-green-900 hover:shadow-lg hover:from-green-900 hover:via-green-800 hover:to-green-600 transition-all duration-300"
             >
-              Profile
+              {authusername[0].toUpperCase()}
             </button>
             {/* Dropdown Menu */}
             <div
@@ -95,9 +129,9 @@ function Header() {
               }`}
             >
               <ul>
-                <li className="px-4 py-2 hover:bg-gray-100 transition duration-200 ease-out cursor-pointer">
+                {/* <li className="px-4 py-2 hover:bg-gray-100 transition duration-200 ease-out cursor-pointer">
                   <Link to="/profile">View Profile</Link>
-                </li>
+                </li> */}
                 <li
                   className="px-4 py-2 hover:bg-gray-100 transition duration-200 ease-out cursor-pointer"
                   onClick={() => navigate("/all-posts")}
@@ -117,24 +151,24 @@ function Header() {
       </nav>
 
       {/* Right: Login & Signup */}
-      <div className="flex items-center space-x-4">
-        {!authStatus && (
-          <>
-            <button
-              onClick={() => navigate("/login")}
-              className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-300"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate("/signup")}
-              className="px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all duration-300"
-            >
-              Signup
-            </button>
+ <div className="flex md-hidden items-center  space-x-6">
+  {!authStatus && (
+          <>         
+<button
+  onClick={() => navigate("/login")}
+  className="px-8 py-3 text-white font-medium rounded-full bg-gradient-to-r from-gray-700 via-gray-900 to-black hover:shadow-lg hover:from-black hover:via-gray-800 hover:to-gray-700 transition-all duration-300"
+>
+  Login
+</button>
+<button
+  onClick={() => navigate("/signup")}
+  className="px-8 py-3  text-white font-medium rounded-full bg-gradient-to-r from-green-600 via-green-800 to-green-900 hover:shadow-lg hover:from-green-900 hover:via-green-800 hover:to-green-600 transition-all duration-300 "
+>
+  Signup
+</button>
           </>
         )}
-      </div>
+      </div> 
     </div>
   </Container>
 </header>
@@ -146,89 +180,3 @@ export default Header;
 
 
 
-
-
-
-
-
-// import React from 'react'
-// import {Container, Logo, Logoutbtn} from '../index'
-// import {Link} from 'react-router-dom'
-// import { useSelector } from 'react-redux'
-// import { useNavigate } from 'react-router-dom'
-
-// function Header() {
-//     const authStatus = useSelector((state) => state.auth.status)
-//     const navigate = useNavigate()
-
-//     const navItems = [
-//         {
-//           name: 'Home',
-//           slug: "/",
-//           active: true
-//         }, 
-//         {
-//           name: "Login",
-//           slug: "/login",
-//           active: !authStatus,
-//       },
-//       {
-//           name: "Signup",
-//           slug: "/signup",
-//           active: !authStatus,
-//       },
-//       {
-//           name: "All Posts",
-//           slug: "/all-posts",
-//           active: authStatus,
-//       },
-//       {
-//           name: "Add Post",
-//           slug: "/add-post",
-//           active: authStatus,
-//       },
-//       {
-//         name: "Profile",
-//         slug: "/profile",
-//         active: authStatus,
-//     },
-//       {
-//           name: "Explore",
-//           slug: "/explore",
-//           active: authStatus,
-//       },
-     
-//       ] 
-//     return (
-//         <header className='py-3 , '>
-//             <Container>
-//                 <nav className='flex'>
-//                     <div className='mr-4'>
-//                     <Link to='/'>
-//                       <Logo width='70px' />
-//                     </Link>
-//                     </div>
-//                     <ul className='flex ml-auto'>
-//                        {navItems.map( (item) => 
-//                         item.active ? (
-//                             <li key={item.name}>
-//                                 <button
-//                                 onClick={() => navigate(item.slug)} className='inline-bock px-6 py-2 duration-200 hover:bg-blue-100 rounded-full'>
-//                                     {item.name}
-//                                 </button>
-//                             </li>
-//                         ) : null
-//                     )}
-//                     {authStatus && (
-//                      <li>
-//                         <Logoutbtn/>
-//                      </li>
-//                     )}
-//                     </ul>
-//                 </nav>
-//             </Container>
-//         </header>
-//     )
-// }
-
-// export default Header

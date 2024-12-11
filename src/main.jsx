@@ -16,6 +16,7 @@ import Signup from "./Pages/Signup";
 import Editpost from "./Pages/Editpost";
 import Allposts from "./Pages/Allpost";
 import Addpost from "./Pages/Addpost";
+import Landing from "./Pages/Landing.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
     children: [
       {
         path : '/',
+        element : <Landing/>
+      },
+      {
+        path : '/home',
         element : <Home/>
       },
       {

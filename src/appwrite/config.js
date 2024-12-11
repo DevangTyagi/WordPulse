@@ -106,6 +106,21 @@ export class DBService {
     }
   }
 
+  async getmyposts(userId, queries = [Query.equal("status", "active")]) {
+    try {
+      queries.push(Query.equal("userId", userId));  
+  
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteCollectionId,
+        queries
+      );
+  
+    } catch (error) {
+      throw error;
+    }
+  }
+
   //file upload services
   async uploadfile(file) {
     try {
