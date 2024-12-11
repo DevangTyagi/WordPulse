@@ -25,9 +25,11 @@ export default function Signup() {
     seterror ("");
     try {     
       const userdata = await authservice.createAccount(data);
+      console.log(userdata);
+      
       if (userdata) {
         const userdata = authservice.getCurrentuser();
-        if (userdata) dispatch(login(userdata));
+        if (userdata) dispatch(login({userdata}));
         navigate("/home");
       }
     } catch (error) {
