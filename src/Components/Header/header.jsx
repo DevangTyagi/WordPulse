@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { Search } from "lucide-react";
 
 import { logout as authlogout } from "../../store/authslice";
+import authservice from "../../appwrite/auth";
 
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
@@ -19,9 +20,6 @@ function Header() {
   const dispatch = useDispatch();
   const [authusername, setAuthUsername] = useState("");
 
-  console.log(authStatus,userdata);
-  
-
   useEffect(() => {
     if (userdata && userdata.name) {
       setAuthUsername(userdata.name);
@@ -32,8 +30,10 @@ function Header() {
 
   const logout = async () => {
     try {
-      dispatch(authlogout);
+      await authservice.logout();
+      dispatch(authlogout());
       navigate("/");
+      setShowDropdown(false);
       setMobileMenuOpen(false);
     } catch (err) {
       console.error(err?.message || "Logout Failed");
@@ -44,12 +44,18 @@ function Header() {
     { name: "Home", slug: "/", active: true },
     { name: "Login", slug: "/login", active: !authStatus },
     { name: "Signup", slug: "/signup", active: !authStatus },
-    { name: "Add Post", slug: "/add-posts", active: authStatus },
+    { name: "Add Post", slug: "/add-post", active: authStatus },
   ];
 
   const handleSearch = () => {
     console.log("Search Query:", searchQuery);
     navigate(`/search?q=${searchQuery}`);
+    setMobileMenuOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    // Reset dropdown and mobile menu when clicking the logo on desktop
+    setShowDropdown(false);
     setMobileMenuOpen(false);
   };
 
@@ -59,7 +65,7 @@ function Header() {
         <div className="flex justify-between items-center">
           {/* Left: Logo */}
           <div className="mr-4">
-            <Link to="/home">
+            <Link to="/" onClick={handleLogoClick}>
               <Logo width="70px" />
             </Link>
           </div>
@@ -156,6 +162,7 @@ function Header() {
                     >
                       <Link to="/all-posts">My Works</Link>
                     </li>
+
                     <li
                       className="px-4 py-2 hover:bg-gray-100 rounded-lg transition duration-200 ease-out cursor-pointer"
                       onClick={() => logout()}
@@ -188,50 +195,35 @@ function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Overlay */}
-          {mobileMenuOpen && (
+           {/* Mobile Menu Overlay */}
+           {mobileMenuOpen && (
             <div className="md:hidden fixed inset-0 bg-white z-50 overflow-y-auto">
               <div className="flex flex-col items-center justify-center h-full space-y-6">
-                {/* Mobile Menu Close Button */}
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="absolute top-4 right-4"
-                >
+                <button onClick={() => setMobileMenuOpen(false)} className="absolute top-4 right-4">
                   <X className="w-8 h-8" />
                 </button>
 
-                {/* Mobile Navigation Items */}
-                {navItems.map(
-                  (item) =>
-                    item.active && (
-                      <Link
-                        key={item.slug}
-                        to={item.slug}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-2xl font-semibold hover:text-green-700 transition"
-                      >
-                        {item.name}
-                      </Link>
-                    )
-                )}
-
-                {/* Mobile Profile Dropdown for Authenticated Users */}
-                {authStatus && authusername && (
-                  <div className="  flex flex-col items-center space-y-4">
-                    <button
-                      onClick={() => {
-                        navigate("/all-posts");
-                        setMobileMenuOpen(false);
-                      }}
+                {navItems.map((item) =>
+                  item.active ? (
+                    <Link
+                      key={item.slug}
+                      to={item.slug}
+                      onClick={() => setMobileMenuOpen(false)}
                       className="text-2xl font-semibold hover:text-green-700 transition"
                     >
+                      {item.name}
+                    </Link>
+                  ) : null
+                )}
+
+                {authStatus && authusername && (
+                  <div className="flex flex-col items-center space-y-4">
+                    <button onClick={() => navigate("/all-posts")} className="text-2xl font-semibold hover:text-green-700 transition">
                       My Works
                     </button>
-                    <button
-                      onClick={() => logout()}
-                      className="text-2xl font-semibold text-red-700 transition"
-                    >
-                      <Logoutbtn />
+                    <button onClick={logout}
+                     className="text-2xl font-semibold text-red-700 transition">
+                      <Logoutbtn  />
                     </button>
                   </div>
                 )}
