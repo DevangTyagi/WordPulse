@@ -36,7 +36,7 @@ export default function Signup() {
           userdata: currentUser 
         }));
         
-        navigate("/home");
+        navigate("/login");
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -115,7 +115,7 @@ export default function Signup() {
       {/* Right side image */}
       <div className="hidden min-h-screen lg:flex w-3/5 items-center justify-center bg-blue-100">
         <img
-          src="public\school-work-851328_1280.jpg"
+          src="/school-work-851328_1280.jpg"
           className="min-h-screen object-cover w-full"
           alt="Signup background"
         />

@@ -106,7 +106,7 @@ function Login() {
 
   <div className="hidden min-h-screen lg:flex w-3/5 items-center justify-center">
   <img
-    src="public\school-work-851328_1280.jpg"
+    src="/school-work-851328_1280.jpg"
     alt="Login Illustration"
     className="min-h-screen rounded-xl object-cover w-full"
   />

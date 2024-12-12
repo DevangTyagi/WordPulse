@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -6,20 +6,33 @@ import { Btn, Input, Select, RTE } from "..";
 import DBServer from "../../appwrite/config";
 
 function Postform({ post }) {
-  const { register, handleSubmit, watch, control, setValue, getValues } = useForm({
-    defaultValues: {
-      title: post?.title || "",
-      slug: post?.$id || "",
-      content: post?.content || "",
-      status: post?.status || "active",
-    },
-  });
+  const [slugError, setSlugError] = useState("");
+  const { register, handleSubmit, watch, control, setValue, getValues } =
+    useForm({
+      defaultValues: {
+        title: post?.title || "",
+        slug: post?.$id || "",
+        content: post?.content || "",
+        status: post?.status || "active",
+      },
+    });
   const navigate = useNavigate();
   const userdata = useSelector((state) => state.auth.userdata);
 
   const submit = async (data) => {
+    // Clear any previous slug error before submission
+    setSlugError("");
+
+    // Check slug length before submission
+    if (data.slug.length > 36) {
+      setSlugError("Slug must be 36 characters or less");
+      return;
+    }
+
     if (post) {
-      const file = data.image[0] ? await DBServer.uploadfile(data.image[0]) : null;
+      const file = data.image[0]
+        ? await DBServer.uploadfile(data.image[0])
+        : null;
       if (file) {
         DBServer.deletefile(post.featuredImage);
       }
@@ -59,14 +72,25 @@ function Postform({ post }) {
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === "title") {
-        setValue("slug", slugTransform(value.title), { shouldValidate: true });
+        const transformedSlug = slugTransform(value.title);
+        setValue("slug", transformedSlug, { shouldValidate: true });
+
+        // Check and set slug error
+        if (transformedSlug.length > 36) {
+          setSlugError("Slug must be 36 characters or less");
+        } else {
+          setSlugError("");
+        }
       }
     });
     return () => subscription.unsubscribe();
   }, [watch, slugTransform, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <form
+      onSubmit={handleSubmit(submit)}
+      className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg"
+    >
       <div className="flex flex-wrap -mx-3">
         <div className="w-full lg:w-2/3 px-3 mb-6">
           <Input
@@ -81,13 +105,27 @@ function Postform({ post }) {
             className="mb-4"
             {...register("slug", { required: true })}
             onInput={(e) => {
-              setValue("slug", slugTransform(e.currentTarget.value), {
+              const transformedSlug = slugTransform(e.currentTarget.value);
+              setValue("slug", transformedSlug, {
                 shouldValidate: true,
               });
+
+              // Check and set slug error
+              if (transformedSlug.length > 36) {
+                setSlugError("Slug must be 36 characters or less");
+              } else {
+                setSlugError("");
+              }
             }}
           />
+          {slugError && (
+            <p className="text-red-500 text-sm mt-1">{slugError}</p>
+          )}
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="content">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="content"
+            >
               Content
             </label>
             <RTE
@@ -99,7 +137,10 @@ function Postform({ post }) {
         </div>
         <div className="w-full lg:w-1/3 px-3">
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="image"
+            >
               Featured Image
             </label>
             <Input
@@ -138,4 +179,3 @@ function Postform({ post }) {
 }
 
 export default Postform;
-
