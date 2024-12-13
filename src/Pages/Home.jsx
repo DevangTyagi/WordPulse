@@ -47,8 +47,7 @@ function Home() {
         posts.map((post) => (
           <div key={post.$id} className="mb-3 break-inside-avoid">
             <Postcard
-              {...post } 
-              onPostcardClick={handleClick}
+              {...post} 
               className="w-full rounded-lg shadow-gray-300 shadow-lg"
             />
           </div>
