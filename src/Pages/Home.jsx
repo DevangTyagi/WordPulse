@@ -38,7 +38,7 @@ function Home() {
       </div>
     </div>
   ) : (
-    <div className="columns-1 sm:columns-2 lg:columns-3 py-10 md:py-10 gap-3">
+    <div className="columns-1 sm:columns-2 lg:columns-3 py-5 md:py-5 gap-3 px-4">
       {posts.length === 0 ? (
         <div className="flex justify-center items-center h-64 text-gray-500">
           <p className="text-xl">No posts found</p>
@@ -47,7 +47,8 @@ function Home() {
         posts.map((post) => (
           <div key={post.$id} className="mb-3 break-inside-avoid">
             <Postcard
-              {...post}
+              {...post } 
+              onPostcardClick={handleClick}
               className="w-full rounded-lg shadow-gray-300 shadow-lg"
             />
           </div>

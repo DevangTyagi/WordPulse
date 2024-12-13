@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import DBServer from "../appwrite/config";
 import { Link } from "react-router-dom";
-function Postcard({ $id, title, featuredImage }){
+function Postcard({ $id, title, featuredImage,onPostcardClick}){
+  // useEffect( () => {
+    
+  // },[])
   return (
     <Link to={`/post/${$id}`}>
         <div className="w-full justify-center mb-4 relative group">

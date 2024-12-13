@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Logo, Logoutbtn } from "../index";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
@@ -14,11 +14,18 @@ function Header() {
   const authStatus = useSelector((state) => state.auth.status);
   const userdata = useSelector((state) => state.auth.userdata);
   const navigate = useNavigate();
+  const location = useLocation(); // Add useLocation hook
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const [authusername, setAuthUsername] = useState("");
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setShowDropdown(false);
+    setMobileMenuOpen(false);
+  }, [location.pathname]); // Add dependency on location
 
   useEffect(() => {
     if (userdata && userdata.name) {
@@ -41,7 +48,7 @@ function Header() {
   };
 
   const navItems = [
-    { name: "Home", slug: "/", active: true },
+    { name: "Home", slug: "/home", active: true },
     { name: "Login", slug: "/login", active: !authStatus },
     { name: "Signup", slug: "/signup", active: !authStatus },
     { name: "Add Post", slug: "/add-post", active: authStatus },
@@ -51,13 +58,29 @@ function Header() {
     console.log("Search Query:", searchQuery);
     navigate(`/search?q=${searchQuery}`);
     setMobileMenuOpen(false);
+    setShowDropdown(false);
   };
 
-  const handleLogoClick = () => {
+  const handleClick = () => {
     // Reset dropdown and mobile menu when clicking the logo on desktop
     setShowDropdown(false);
     setMobileMenuOpen(false);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdownElement = document.getElementById('profile-dropdown');
+      if (dropdownElement && !dropdownElement.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="md:px-12 py-3 relative z-50 bg-white">
@@ -65,7 +88,7 @@ function Header() {
         <div className="flex justify-between items-center">
           {/* Left: Logo */}
           <div className="mr-4">
-            <Link to="/" onClick={handleLogoClick}>
+            <Link to="/" onClick={handleClick}>
               <Logo width="70px" />
             </Link>
           </div>
@@ -141,7 +164,7 @@ function Header() {
 
             {/* Profile Dropdown for Desktop */}
             {authStatus && authusername && (
-              <div className="relative ml-4">
+              <div className="relative ml-4" id="profile-dropdown">
                 <button
                   onClick={() => setShowDropdown((prev) => !prev)}
                   className="inline-block px-5 py-3 sm:block bg-gray-200 hover:bg-gray-300 text-white font-bold text-xl rounded-full bg-gradient-to-r from-green-600 via-green-800 to-green-900 hover:shadow-lg hover:from-green-900 hover:via-green-800 hover:to-green-600 transition-all duration-300"
@@ -158,7 +181,19 @@ function Header() {
                   <ul>
                     <li
                       className="px-4 py-2 hover:bg-gray-100 transition duration-200 ease-out cursor-pointer"
-                      onClick={() => navigate("/all-posts")}
+                      onClick={() => {
+                        setShowDropdown(false)
+                        navigate("/home")                        
+                      }}
+                    >
+                      <Link to="/home">Home</Link>
+                    </li>
+                    <li
+                      className="px-4 py-2 hover:bg-gray-100 transition duration-200 ease-out cursor-pointer"
+                      onClick={() => {
+                        setShowDropdown(false)
+                        navigate("/all-posts")                        
+                      }}
                     >
                       <Link to="/all-posts">My Works</Link>
                     </li>
@@ -195,8 +230,8 @@ function Header() {
             )}
           </div>
 
-           {/* Mobile Menu Overlay */}
-           {mobileMenuOpen && (
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
             <div className="md:hidden fixed inset-0 bg-white z-50 overflow-y-auto">
               <div className="flex flex-col items-center justify-center h-full space-y-6">
                 <button onClick={() => setMobileMenuOpen(false)} className="absolute top-4 right-4">
@@ -218,7 +253,10 @@ function Header() {
 
                 {authStatus && authusername && (
                   <div className="flex flex-col items-center space-y-4">
-                    <button onClick={() => navigate("/all-posts")} className="text-2xl font-semibold hover:text-green-700 transition">
+                    <button onClick={() => {
+                      setMobileMenuOpen(false)
+                      navigate("/all-posts")
+                    }} className="text-2xl font-semibold hover:text-green-700 transition">
                       My Works
                     </button>
                     <button onClick={logout}
