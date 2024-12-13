@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import DBServer from "../appwrite/config";
 import { Container, Postcard } from "../Components";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Home() {
   const [posts, setposts] = useState([]);
@@ -11,11 +11,21 @@ function Home() {
   const authStatus = useSelector((state) => state.auth.status);
   const [loading, setloading] = useState(true);
 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const searchQuery = queryParams.get("q"); 
+
+
   useEffect(() => {
     if (authStatus) {
+      setloading(true)
+      // Check if there is a search query and filter posts based on it
       DBServer.getposts().then((posts) => {
         if (posts) {
-          setposts(posts.documents);
+          const filteredPosts = posts.documents.filter((post) =>
+            post.title.toLowerCase().includes(searchQuery?.toLowerCase() || "")
+          );
+          setposts(filteredPosts);
         }
         setloading(false);
       });
@@ -23,7 +33,7 @@ function Home() {
       setposts([]);
       setloading(false);
     }
-  }, [authStatus]);
+  }, [authStatus, searchQuery]);
 
   if (!authStatus) {
     navigate("/");

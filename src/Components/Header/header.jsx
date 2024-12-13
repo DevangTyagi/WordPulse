@@ -56,7 +56,7 @@ function Header() {
 
   const handleSearch = () => {
     console.log("Search Query:", searchQuery);
-    navigate(`/search?q=${searchQuery}`);
+    navigate(`/home?q=${searchQuery}`);
     setMobileMenuOpen(false);
     setShowDropdown(false);
   };
@@ -103,11 +103,12 @@ function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="px-2 py-1 w-24 border border-gray-300 rounded-full text-sm"
+                  className="px-2 py-1 w-40 pr-8 border border-gray-300 rounded-full text-sm" 
                 />
                 <button
                   onClick={handleSearch}
-                  className="absolute right-0 px-2 py-1"
+                  className="absolute right-0 px-2 py-1 rounded-full 
+                             hover:scale-110 transition-all duration-300 ease-out"
                 >
                   <Search className="w-4 h-4" />
                 </button>
@@ -122,7 +123,7 @@ function Header() {
               {mobileMenuOpen ? (
                 <X className="w-6 h-6" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-6 h-6 hover:scale-110 transition-all duration-300 ease-out" />
               )}
             </button>
           </div>
@@ -137,7 +138,7 @@ function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="px-4 py-2 w-32 lg:w-96 border border-gray-300 rounded-full 
+                  className="px-4 py-2 w-32 pr-8 lg:w-96 border border-gray-300 rounded-full 
                              focus:w-[450px] focus:outline-none focus:ring-2 focus:ring-blue-400 
                              focus:border-blue-400 transition-all duration-300 ease-in-out"
                 />
